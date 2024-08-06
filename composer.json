@@ -1,0 +1,20 @@
+{
+  "name": "yireo/magento2-graph-ql-schema-manipulation",
+  "version": "0.0.1",
+  "description": "Magento module to manipulate the GraphQl schema",
+  "type": "magento2-module",
+  "require": {
+    "magento/framework": "^103.0"
+  },
+  "license": [
+    "OSL-3.0"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Yireo\\GraphQlSchemaManipulation\\": ""
+    }
+  }
+}

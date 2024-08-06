@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Framework\GraphQl\SchemaFactory" type="Yireo\GraphQlSchemaManipulation\Schema\SchemaFactory"/>
+
+    <type name="GraphQL\Type\Schema">
+        <plugin name="Yireo_GraphQlSchemaManipulation::addSchemaManipulators"
+                type="Yireo\GraphQlSchemaManipulation\Plugin\AddSchemaManipulators"/>
+    </type>
+</config>

@@ -3,7 +3,6 @@
 **Magento 2 module to manipulate the GraphQL schema before it is being used. This can be useful when trying to remove endpoints that are added by monolithic extensions and perhaps other use-cases.**
 
 ### Installation
-First register the sources of this repository as a composer repository. Then, install things:
 ```bash
 composer require yireo/magento2-graph-ql-schema-manipulation
 bin/magento module:enable Yireo_GraphQlSchemaManipulation

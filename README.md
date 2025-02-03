@@ -13,15 +13,15 @@ To manipulate the schema yourself, you will need to create a class similar to th
 ```php
 class ExampleSchemaManipulator implements \Yireo\GraphQlSchemaManipulation\Schema\ManipulationInterface
 {
-    public function manipulateResolvedTypes(array $resolvedTypes): array
+    public function manipulateFieldsConfig(array $config): array
     {
-        foreach ($resolvedTypes as $resolvedTypeIndex => $type) {
-            if (stristr($type->name(), 'Foobar')) {
-                unset($resolvedTypes[$resolvedTypeIndex]);
+        foreach ($config as $fieldIndex => $field) {
+            if (in_array($fieldIndex, ['isEmailAvailable'])) {
+                unset($config[$fieldIndex]);
             }
         }
-        
-        return $resolvedTypes;
+
+        return $config;
     }
 }
 ```

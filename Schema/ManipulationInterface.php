@@ -6,5 +6,5 @@ namespace Yireo\GraphQlSchemaManipulation\Schema;
 
 interface ManipulationInterface
 {
-    public function manipulateResolvedTypes(array $resolvedTypes): array;
+    public function manipulateFieldsConfig(array $config): array;
 }

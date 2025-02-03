@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Yireo\GraphQlSchemaManipulation\Plugin;
 
-use GraphQL\Type\Schema;
+use Magento\Framework\GraphQl\Config\Element\FieldsFactory;
+use Magento\Framework\GraphQl\Schema;
+use Magento\Framework\GraphQl\Schema\SchemaGeneratorInterface;
 use RuntimeException;
 use Yireo\GraphQlSchemaManipulation\Schema\ManipulationInterface;
 
@@ -18,16 +20,16 @@ class AddSchemaManipulators
     )
     {
     }
-    
-    public function afterGetTypeMap(Schema $subject, array $resolvedTypes): array
+
+    public function afterCreateFromConfigData(FieldsFactory $subject, array $config): array
     {
         foreach ($this->getSchemaManipulators() as $schemaManipulator) {
-            $resolvedTypes = $schemaManipulator->manipulateResolvedTypes($resolvedTypes);
+            $config = $schemaManipulator->manipulateFieldsConfig($config);
         }
-        
-        return $resolvedTypes;
+
+        return $config;
     }
-    
+
     private function getSchemaManipulators(): array
     {
         foreach ($this->schemaManipulators as $schemaManipulator) {
@@ -35,7 +37,7 @@ class AddSchemaManipulators
                 throw new RuntimeException('Class "'.get_class($schemaManipulator).'" should be of type "'.ManipulationInterface::class.'"');
             }
         }
-        
+
         return $this->schemaManipulators;
     }
 }

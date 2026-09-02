@@ -1,0 +1,7 @@
+{
+    "module_name": "Yireo_GraphQlSchemaManipulation",
+    "composer_name": "yireo/magento2-graph-ql-schema-manipulation",
+    "sequence": [
+        "Magento_GraphQl"
+    ]
+}

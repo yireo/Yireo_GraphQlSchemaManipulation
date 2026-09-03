@@ -1,5 +1,13 @@
 # Yireo GraphQlSchemaManipulation
 
+<!-- badges.specs.start -->
+![Magento version](https://img.shields.io/badge/Magento-2.4.6%20%7C%202.4.9-orange)
+![PHP version](https://img.shields.io/badge/PHP-8.2%E2%80%938.5-777BB4)
+![License](https://img.shields.io/badge/License-OSL--3.0-blue)
+![Latest Version](https://img.shields.io/packagist/v/yireo/magento2-graph-ql-schema-manipulation)
+<!-- badges.specs.end -->
+
+
 **Magento 2 module to manipulate the GraphQL schema before it is being used. This can be useful when trying to remove endpoints that are added by monolithic extensions and perhaps other use-cases.**
 
 ### Installation
@@ -40,3 +48,13 @@ Next, create a `di.xml` file that adds this class to this module:
     </type>
 </config>
 ```
+
+## Current status
+
+<!-- badges.test.start -->
+![Static Tests](https://img.shields.io/github/actions/workflow/status/yireo/Yireo_GraphQlSchemaManipulation/static-tests.yml?label=static-tests)
+![Unit Tests](https://img.shields.io/github/actions/workflow/status/yireo/Yireo_GraphQlSchemaManipulation/unit-tests.yml?label=unit-tests)
+![Integration Tests](https://img.shields.io/github/actions/workflow/status/yireo/Yireo_GraphQlSchemaManipulation/integration-tests.yml?label=integration-tests)
+![Playwright](https://img.shields.io/github/actions/workflow/status/yireo/Yireo_GraphQlSchemaManipulation/playwright.yml?label=playwright)
+![DI Compilation](https://img.shields.io/github/actions/workflow/status/yireo/Yireo_GraphQlSchemaManipulation/compile.yml?label=compile)
+<!-- badges.test.end -->

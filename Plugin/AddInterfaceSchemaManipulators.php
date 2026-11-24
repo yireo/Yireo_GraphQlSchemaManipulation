@@ -8,6 +8,10 @@ use Magento\Framework\GraphQl\Config\ConfigElementInterface;
 use Magento\Framework\GraphQl\Config\Element\InterfaceFactory;
 use Magento\Framework\GraphQl\Config\Element\InterfaceType;
 
+/**
+ * @deprecated Use a \Yireo\GraphQlSchemaManipulation\Schema\SchemaConfigManipulatorInterface instead
+ * @see ManipulateSchemaConfig
+ */
 class AddInterfaceSchemaManipulators
 {
     public function __construct(

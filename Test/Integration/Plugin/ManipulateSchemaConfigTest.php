@@ -23,10 +23,7 @@ class ManipulateSchemaConfigTest extends TestCase
 {
     protected function tearDown(): void
     {
-        $objectManager = Bootstrap::getObjectManager();
-        if ($objectManager instanceof ObjectManager) {
-            $objectManager->removeSharedInstance(ManipulateSchemaConfig::class);
-        }
+        $this->getObjectManager()->removeSharedInstance(ManipulateSchemaConfig::class);
     }
 
     public function testPluginIsRegisteredGlobally(): void
@@ -43,7 +40,7 @@ class ManipulateSchemaConfigTest extends TestCase
 
     public function testFieldsAreRemovedFromTypesAndInterfaces(): void
     {
-        $objectManager = Bootstrap::getObjectManager();
+        $objectManager = $this->getObjectManager();
         $editor = $objectManager->get(SchemaConfigEditor::class);
         $manipulator = new class($editor) implements SchemaConfigManipulatorInterface {
             public function __construct(
@@ -76,6 +73,14 @@ class ManipulateSchemaConfigTest extends TestCase
         $this->assertArrayNotHasKey('meta_title', $config->getConfigElement('ProductInterface')->getFields());
         $this->assertArrayNotHasKey('meta_title', $config->getConfigElement('SimpleProduct')->getFields());
         $this->assertArrayHasKey('sku', $config->getConfigElement('SimpleProduct')->getFields());
+    }
+
+    private function getObjectManager(): ObjectManager
+    {
+        $objectManager = Bootstrap::getObjectManager();
+        $this->assertInstanceOf(ObjectManager::class, $objectManager);
+
+        return $objectManager;
     }
 
     /**

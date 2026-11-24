@@ -19,7 +19,7 @@ jobs:
     outputs:
       has_tests: ${{ steps.check.outputs.has_tests }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: Test/Playwright
 
@@ -40,8 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: ${{ fromJSON(vars.PLAYWRIGHT_JOB_TIMEOUT || '45') }}
     container:
-      image: yireo/playwright:1.63.0
+      image: yireo/playwright:1.63.0@sha256:b91b1af77e5400430e6c69e58508b5e6260451d240bde51d4be443fc33cb5f9c
       options: --user root
+      # The Docker socket gives this job full control over the runner's Docker daemon (needed for docker cp/exec
+      # into the PHP service). Only run this job on ephemeral GitHub-hosted runners, never on self-hosted runners
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
 
@@ -82,7 +84,7 @@ jobs:
         env: *magento-env
 
       mysql:
-        image: yireo/mariadb:10
+        image: yireo/mariadb:10@sha256:f35913d3dfdeac18f652af3b3dee136283b4237233de190543675cc9524f89f7
         credentials: ${{ secrets.DOCKERHUB_USERNAME && fromJSON(format('{{"username":"{0}","password":"{1}"}}', secrets.DOCKERHUB_USERNAME, secrets.DOCKERHUB_TOKEN)) || null }}
         env:
           MYSQL_DATABASE: magento2
@@ -92,12 +94,12 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
 
       redis:
-        image: redis:7
+        image: redis:7@sha256:6b645a37f49b0546582468706b32e71a8b7fbb5ba4583d0f9e27a8004716b738
         credentials: ${{ secrets.DOCKERHUB_USERNAME && fromJSON(format('{{"username":"{0}","password":"{1}"}}', secrets.DOCKERHUB_USERNAME, secrets.DOCKERHUB_TOKEN)) || null }}
         options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
 
       opensearch:
-        image: yireo/opensearch
+        image: yireo/opensearch:latest@sha256:9ad8a7eeffb79789918d7c96d865bfa0ba5c0e92fe5fba60a21ca74616add500
         credentials: ${{ secrets.DOCKERHUB_USERNAME && fromJSON(format('{{"username":"{0}","password":"{1}"}}', secrets.DOCKERHUB_USERNAME, secrets.DOCKERHUB_TOKEN)) || null }}
         env:
           OPENSEARCH_JAVA_OPTS: "-Xms128m -Xmx128m"
@@ -106,7 +108,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
 
@@ -160,7 +162,7 @@ jobs:
 
       - name: Restore Composer cache
         if: github.event.pull_request.head.repo.fork != true && !env.ACT
-        uses: actions/cache@v4
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: /tmp/composer-cache
           key: composer-playwright-${{ env.MAGENTO_VERSION }}-${{ hashFiles('composer.json') }}
@@ -187,14 +189,13 @@ jobs:
             composer config repositories.local-source path /tmp/magento/package-source
             EXTRA_PACKAGES=""
             case "${COMPOSER_NAME}" in
-              loki-checkout/*) EXTRA_PACKAGES="loki-checkout/magento2-functional-tests:dev-main" ;;
+              loki-checkout/*) 
+                EXTRA_PACKAGES="loki-checkout/magento2-core-cli loki-checkout/magento2-csp loki-checkout/magento2-functional-tests:dev-main loki-checkout/magento2-luma loki-checkout/magento2-hyva loki-checkout/magento2-sample-data"
+                ;;
             esac
             composer require -n --prefer-dist -- \
               "${COMPOSER_NAME}:@dev" ${EXTRA_PACKAGES} \
               loki/magento2-functional-tests:dev-main \
-              loki-checkout/magento2-luma:@dev \
-              loki-checkout/magento2-sample-data:@dev \
-              loki-checkout/magento2-hyva:@dev \
               yireo/magento2-enable-module-sequence:@dev \
               hyva-themes/magento2-default-theme-csp \
               hyva-themes/magento2-theme-module \
@@ -227,9 +228,11 @@ jobs:
             bin/magento module:enable Yireo_EnableModuleSequence
             EXTRA_MODULES=""
             case "${COMPOSER_NAME}" in
-              loki-checkout/*) EXTRA_MODULES="LokiCheckout_FunctionalTests" ;;
+              loki-checkout/*)
+                EXTRA_MODULES="LokiCheckout_CoreCli LokiCheckout_Csp LokiCheckout_FunctionalTests LokiCheckout_Luma LokiCheckout_Hyva LokiCheckout_SampleData"
+                ;;
             esac
-            bin/magento module:sequence Loki_FunctionalTests LokiCheckout_SampleData LokiCheckout_Luma Hyva_Theme Hyva_BaseLayoutReset Hyva_Email Hyva_GraphqlTokens Hyva_GraphqlViewModel Hyva_OrderCancellationWebapi Hyva_CompatModuleFallback ${EXTRA_MODULES} ${MAGENTO_MODULE}
+            bin/magento module:sequence Loki_FunctionalTests Hyva_Theme Hyva_BaseLayoutReset Hyva_Email Hyva_GraphqlTokens Hyva_GraphqlViewModel Hyva_OrderCancellationWebapi Hyva_CompatModuleFallback ${EXTRA_MODULES} ${MAGENTO_MODULE}
             bin/magento setup:upgrade
             bin/magento config:set dev/static/sign 0
             bin/magento setup:static-content:deploy -f --area frontend --area adminhtml en_US
@@ -254,7 +257,7 @@ jobs:
 
       - name: Restore npm cache
         if: ${{ !env.ACT }}
-        uses: actions/cache@v4
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ~/.npm
           key: npm-${{ steps.npm-cache-key.outputs.hash }}
@@ -282,7 +285,6 @@ jobs:
           TEST_TIMEOUT: ${{ vars.TEST_TIMEOUT || '60000' }}
           PLAYWRIGHT_RETRIES: ${{ vars.PLAYWRIGHT_RETRIES || '1' }}
           PLAYWRIGHT_MAX_FAILURES: ${{ vars.PLAYWRIGHT_MAX_FAILURES || '5' }}
-          NODE_TLS_REJECT_UNAUTHORIZED: "0"
         run: |
           echo "Installing npm dependencies..."
           if [ -f package-lock.json ]; then
@@ -296,7 +298,9 @@ jobs:
           printf "TEST_URL=%s\nTEST_TOKEN=loki\nMODULE_NAME=%s\n" "${MAGENTO_BASE_URL}" "${MAGENTO_MODULE}" > /tmp/magento/.env.playwright
 
           echo "Running Playwright tests for project ${MAGENTO_MODULE}"
-          npx playwright test \
+          # TLS verification is only disabled for the test run against the self-signed Magento certificate,
+          # never for downloading npm packages or browsers
+          NODE_TLS_REJECT_UNAUTHORIZED=0 npx playwright test \
             --project="${MAGENTO_MODULE}" \
             --reporter=list \
             --trace=off \

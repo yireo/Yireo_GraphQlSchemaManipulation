@@ -45,6 +45,8 @@ if [ -n "${MAGENTO_MARKETPLACE_PUBLIC_KEY:-}" ]; then
 fi
 
 # Module-specific scripts may rely on unset variables
+# Note: the registry credentials above are already in the global Composer auth.json at this point, so any script
+# sourced below (and any Composer plugin it installs) can read them. Only use read-only, narrowly scoped tokens
 set +u
 
 if [ -f "$PACKAGE_SOURCE/.github/workflows/composer-additional.sh" ]; then

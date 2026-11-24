@@ -6,6 +6,7 @@ namespace Yireo\GraphQlSchemaManipulation\Test\Integration\Plugin;
 
 use Magento\Framework\Config\DataInterface;
 use Magento\Framework\GraphQl\Config;
+use Magento\Framework\GraphQl\Config\Element\TypeInterface;
 use Magento\Framework\GraphQlSchemaStitching\GraphQlReader;
 use Magento\Framework\ObjectManager\Config\Reader\Dom as DiConfigReader;
 use Magento\TestFramework\Helper\Bootstrap;
@@ -69,10 +70,23 @@ class ManipulateSchemaConfigTest extends TestCase
         $this->assertArrayHasKey('meta_title', $schemaConfig['ProductFilterInput']['fields']);
 
         $config = $objectManager->create(Config::class, ['data' => $this->createConfigData($schemaConfig)]);
-        $this->assertArrayNotHasKey('isEmailAvailable', $config->getConfigElement('Query')->getFields());
-        $this->assertArrayNotHasKey('meta_title', $config->getConfigElement('ProductInterface')->getFields());
-        $this->assertArrayNotHasKey('meta_title', $config->getConfigElement('SimpleProduct')->getFields());
-        $this->assertArrayHasKey('sku', $config->getConfigElement('SimpleProduct')->getFields());
+        $this->assertArrayNotHasKey('isEmailAvailable', $this->getFields($config, 'Query'));
+        $this->assertArrayNotHasKey('meta_title', $this->getFields($config, 'ProductInterface'));
+        $this->assertArrayNotHasKey('meta_title', $this->getFields($config, 'SimpleProduct'));
+        $this->assertArrayHasKey('sku', $this->getFields($config, 'SimpleProduct'));
+    }
+
+    /**
+     * @param Config $config
+     * @param string $typeName
+     * @return array<string, mixed>
+     */
+    private function getFields(Config $config, string $typeName): array
+    {
+        $configElement = $config->getConfigElement($typeName);
+        $this->assertInstanceOf(TypeInterface::class, $configElement);
+
+        return $configElement->getFields();
     }
 
     private function getObjectManager(): ObjectManager

@@ -49,6 +49,8 @@ Next, create a `di.xml` file that adds this class to this module:
 </config>
 ```
 
+The manipulators are applied to the fields of types and inputs (`FieldsFactory`), and to the fields of interfaces (`InterfaceFactory`). Each `$field` is an instance of `Magento\Framework\GraphQl\Config\Element\Field`.
+
 ## Current status
 
 <!-- badges.test.start -->

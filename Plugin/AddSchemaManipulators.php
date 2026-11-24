@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Yireo\GraphQlSchemaManipulation\Plugin;
 
 use Magento\Framework\GraphQl\Config\Element\FieldsFactory;
-use Magento\Framework\GraphQl\Schema;
-use Magento\Framework\GraphQl\Schema\SchemaGeneratorInterface;
 use RuntimeException;
 use Yireo\GraphQlSchemaManipulation\Schema\ManipulationInterface;
 
@@ -22,6 +20,11 @@ class AddSchemaManipulators
     }
 
     public function afterCreateFromConfigData(FieldsFactory $subject, array $config): array
+    {
+        return $this->manipulateFieldsConfig($config);
+    }
+
+    public function manipulateFieldsConfig(array $config): array
     {
         foreach ($this->getSchemaManipulators() as $schemaManipulator) {
             $config = $schemaManipulator->manipulateFieldsConfig($config);

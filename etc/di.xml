@@ -10,6 +10,11 @@
                 type="Yireo\GraphQlSchemaManipulation\Plugin\AddSchemaManipulators"/>
     </type>
 
+    <type name="Magento\Framework\GraphQl\Config\Element\InterfaceFactory">
+        <plugin name="Yireo_GraphQlSchemaManipulation::addInterfaceSchemaManipulators"
+                type="Yireo\GraphQlSchemaManipulation\Plugin\AddInterfaceSchemaManipulators"/>
+    </type>
+
     <!--
     <type name="Magento\Framework\GraphQl\Schema">
         <plugin name="Yireo_GraphQlSchemaManipulation::addSchemaManipulators"

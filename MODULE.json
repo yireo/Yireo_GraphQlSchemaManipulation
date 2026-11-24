@@ -3,5 +3,7 @@
     "composer_name": "yireo/magento2-graph-ql-schema-manipulation",
     "sequence": [
         "Magento_GraphQl"
-    ]
+    ],
+    "phpcs_severity": "7",
+    "phpstan_level": "3"
 }

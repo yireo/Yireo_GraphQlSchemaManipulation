@@ -50,7 +50,7 @@ jobs:
       COMPOSER_CACHE_DIR: /tmp/composer-cache
     services:
       mysql:
-        image: yireo/mariadb:10@sha256:f35913d3dfdeac18f652af3b3dee136283b4237233de190543675cc9524f89f7
+        image: yireo/mariadb:10
         credentials: ${{ secrets.DOCKERHUB_USERNAME && fromJSON(format('{{"username":"{0}","password":"{1}"}}', secrets.DOCKERHUB_USERNAME, secrets.DOCKERHUB_TOKEN)) || null }}
         env:
           MYSQL_ROOT_PASSWORD: root
@@ -59,7 +59,7 @@ jobs:
           MYSQL_DATABASE: magento2
         options: --tmpfs /tmp:rw --tmpfs /var/lib/mysql:rw --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
       opensearch:
-        image: yireo/opensearch:latest@sha256:9ad8a7eeffb79789918d7c96d865bfa0ba5c0e92fe5fba60a21ca74616add500
+        image: yireo/opensearch:latest
         credentials: ${{ secrets.DOCKERHUB_USERNAME && fromJSON(format('{{"username":"{0}","password":"{1}"}}', secrets.DOCKERHUB_USERNAME, secrets.DOCKERHUB_TOKEN)) || null }}
         env:
           'discovery.type': single-node
@@ -67,7 +67,7 @@ jobs:
           OPENSEARCH_INITIAL_ADMIN_PASSWORD: "admin"
         options: --health-cmd="curl localhost:9200/_cluster/health?wait_for_status=yellow&timeout=60s" --health-interval=10s --health-timeout=5s --health-retries=10
       redis:
-        image: redis:7@sha256:6b645a37f49b0546582468706b32e71a8b7fbb5ba4583d0f9e27a8004716b738
+        image: redis:7
         options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 10
     steps:
       - name: Checkout sources
@@ -92,9 +92,14 @@ jobs:
           done
 
       - name: Setting up module variables
+        shell: bash
         run: |
-          echo "COMPOSER_NAME=$(jq -er '.name' composer.json)" >> "$GITHUB_ENV"
-          echo "MAGENTO_MODULE=$(jq -er '.module_name' MODULE.json)" >> "$GITHUB_ENV"
+          COMPOSER_NAME=$(jq -er '.name' composer.json)
+          MAGENTO_MODULE=$(jq -er '.module_name' MODULE.json)
+          [[ "$COMPOSER_NAME" =~ ^[a-z0-9_.-]+/[a-z0-9_.-]+$ ]] || { echo "::error::Invalid composer name"; exit 1; }
+          [[ "$MAGENTO_MODULE" =~ ^[A-Za-z0-9]+_[A-Za-z0-9]+$ ]] || { echo "::error::Invalid module name"; exit 1; }
+          echo "COMPOSER_NAME=$COMPOSER_NAME" >> "$GITHUB_ENV"
+          echo "MAGENTO_MODULE=$MAGENTO_MODULE" >> "$GITHUB_ENV"
 
       - name: Configure Composer
         env:
